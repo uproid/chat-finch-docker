@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="{{ $e.ln }}" dir="{{ $t('dir') }}" class="h-full overflow-hidden">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{% block title %}{% endblock %} | {{ $t(title ?? 'Finch Chat') }}</title>
+	<meta name="robots" content="noindex, nofollow">
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+	<link rel="stylesheet" href="/assets/generated-tailwind.css">
+	<link rel="stylesheet" href="/assets/app.css" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+		integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+	{% block stylesheets %}
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+		rel="stylesheet">
+	{{ assets.css() }}
+	{% endblock %}
+</head>
+
+<body  class="h-full overflow-hidden bg-slate-950 font-sans antialiased text-slate-100">
+	<div id="chat-home-vue"></div>
+
+	{% block footer %}
+	{% include 'footer.j2.html' %}
+	{% endblock %}
+
+	<script type="module" src="/assets/vue/home.js"></script>
+</body>
+
+</html>

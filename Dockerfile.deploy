@@ -1,0 +1,42 @@
+FROM node:20-alpine AS nodejs
+## BUILD NODEJS
+WORKDIR /app
+COPY . .
+RUN npm ci && npm run build
+
+
+## BUILD FINCH
+FROM uproid/finch:latest AS finch
+WORKDIR /app
+
+ENV WIDGETS_PATH=./lib/widgets
+ENV WIDGETS_TYPE=j2.html
+ENV LANGUAGE_PATH=./lib/languages
+ENV PUBLIC_DIR=./public
+ENV LOCAL_DEBUG=true
+ENV ENABLE_DATABASE=true
+
+COPY . .
+RUN dart pub get --no-offline
+RUN dart build cli -t ./lib/app.dart -o cli
+
+## START NGINX & APP
+FROM nginx:latest
+WORKDIR /var/www/html
+
+#ENV MYSQL_HOST=host.docker.internal
+#ENV MYSQL_PORT=3306
+#ENV MYSQL_USER=root
+#ENV MYSQL_PASSWORD=password
+#ENV MYSQL_DATABASE=chat
+
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=finch /app/cli/bundle/ /www/app
+COPY --from=nodejs /app/public /www/app/public
+COPY migrations/ /www/app/migrations/
+
+# START SCRIPT
+RUN echo '#!/bin/sh\n/www/app/bin/app migrate --init &\nnginx -g "daemon off;"\n' > /start.sh && chmod +x /start.sh
+
+EXPOSE 2222
+CMD ["/start.sh"]

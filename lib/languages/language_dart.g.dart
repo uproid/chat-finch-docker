@@ -1,0 +1,4 @@
+var languageDart = {
+ 	"en": {"dir":"ltr","error.field.required":"This field is required","error.field.password":"Password must be at least 8 characters long and contain a mix of letters, numbers, and special characters","error.field.unique":"This field is already taken"},
+ 
+};

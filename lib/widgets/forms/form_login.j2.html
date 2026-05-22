@@ -1,0 +1,55 @@
+<form action="/login" method="post" class="space-y-5">
+    <input type="hidden" name="token" value="{{ $n('form_login/token/value') }}" />
+    {% if $n('form_login/token/error') %}
+    <span class="text-sm text-red-500 ms-2 flex items-center gap-1">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <p>{{ $n('form_login/token/error') | tr }}</p>
+    </span>
+    {% endif %}
+    <div class="space-y-2">
+        <label for="username" class="block text-sm font-bold text-slate-700">Username</label>
+        <div
+            class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 transition focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(16,185,129,0.12)]">
+            <i class="fa-regular fa-user text-slate-400"></i>
+            <input id="username" name="username" type="text" autocomplete="username" placeholder="Enter your username"
+                class="w-full border-0 bg-transparent p-0 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                value="{{ $n('form_login/username/value') }}">
+        </div>
+        {% if $n('form_login/username/error') %}
+        <span class="text-sm text-red-500 ms-2 flex items-center gap-1">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <p>{{ $n('form_login/username/error') | tr }}</p>
+        </span>
+        {% endif %}
+    </div>
+
+    <div class="space-y-2">
+        <div class="flex items-center justify-between gap-3">
+            <label for="password" class="block text-sm font-bold text-slate-700">Password</label>
+            <a href="/register"
+                class="text-xs font-bold uppercase tracking-[0.24em] text-emerald-700 transition hover:text-emerald-500">
+                Register now
+            </a>
+        </div>
+        <div
+            class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 transition focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(16,185,129,0.12)]">
+            <i class="fa-solid fa-key text-slate-400"></i>
+            <input id="password" name="password" type="password" autocomplete="current-password"
+                placeholder="Enter your password"
+                class="w-full border-0 bg-transparent p-0 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                value="{{ $n('form_login/password/value') }}">
+        </div>
+        {% if $n('form_login/password/error') %}
+        <span class="text-sm text-red-500 ms-2 flex items-center gap-1">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <p>{{ $n('form_login/password/error') | tr }}</p>
+        </span>
+        {% endif %}
+    </div>
+
+    <button type="submit"
+        class="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-5 py-4 text-sm font-extrabold uppercase tracking-[0.2em] text-white transition hover:-translate-y-0.5 hover:bg-emerald-600 focus:outline-none focus:ring-4 focus:ring-emerald-200">
+        Login
+        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+    </button>
+</form>

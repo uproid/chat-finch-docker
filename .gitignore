@@ -1,0 +1,7 @@
+mysql/
+TODOS/
+pubspec.lock
+node_modules/
+.dart_tool/
+sqlite
+.vscode/

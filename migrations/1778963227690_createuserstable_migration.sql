@@ -1,0 +1,18 @@
+-- 2026-05-16 20:27:07.698527 
+-- MySQL Migration File 
+-- Name: create_users_table 
+-- ## NEW VERSION:
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    login_secret VARCHAR(512) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ## ROLL BACK:
+
+DROP TABLE IF EXISTS users;
+

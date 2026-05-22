@@ -1,0 +1,57 @@
+services:
+  finch-chat:
+    hostname: finch
+    container_name: finch-chat
+    image: uproid/finch:latest
+    restart: always
+    ports:
+      - "2020:2020"
+      - "2121:2121"
+    build:
+      context: .
+    volumes:
+      - ./lib/:/www/lib/
+      - ./public/:/www/public/
+      - ./migrations/:/www/migrations/ 
+    tty: true
+    stdin_open: true
+
+  nodejs:
+    image: node:20-alpine
+    working_dir: /app
+    tty: true
+    stdin_open: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=500
+      - TAILWIND_MODE=watch
+    volumes:
+      - ./:/app
+    command: sh -c "npm install && npm run watch"
+    restart: always
+
+  nginx:
+    image: nginx:latest
+    hostname: nginx
+    restart: always
+    ports:
+      - "2222:2222"
+    volumes:
+      - ${PWD-.}/public/:/var/www/html/public
+      - ${PWD-.}/docker/nginx.conf:/etc/nginx/conf.d/default.conf
+
+  mysql:
+    image: mysql:latest
+    hostname: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example_password
+      MYSQL_DATABASE: example_db
+      MYSQL_USER: example_user
+      MYSQL_PASSWORD: example_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ${PWD-.}/mysql:/var/lib/mysql
+    networks:
+      - default

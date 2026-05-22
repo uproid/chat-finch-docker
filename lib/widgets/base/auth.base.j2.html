@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="{{ $e.ln }}" dir="{{ $t('dir') }}" class="h-full overflow-x-hidden">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}{% endblock %} | {{ $t(title ?? 'Finch Chat') }}</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/assets/generated-tailwind.css" />
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  {% block stylesheets %}
+  {{ assets.css() }}
+  {% endblock %}
+</head>
+
+<body class="h-full bg-gray-50 font-sans antialiased overflow-x-hidden">
+  <div class="flex min-h-screen w-screen max-w-full bg-gradient-to-br from-gray-50 to-blue-50/30 overflow-x-hidden">
+    <!-- Main Component -->
+      <main class="content flex-1 px-4 py-6 mt-16 lg:px-8 lg:py-8 w-full min-w-0">
+        <div class="mx-auto w-full max-w-7xl min-w-0">
+          {% block content %}
+          {% endblock %}
+        </div>
+      </main>
+  </div>
+
+  {% block footer %}
+  {% include 'footer.j2.html' %}
+  {% endblock %}
+
+  {% block script %}{% endblock %}
+</body>
+</html>
