@@ -107,7 +107,8 @@ class ChatsTable extends MysqlTable {
           Condition(QField('chats.receiver_id'), QO.IN, QVar(users)),
           Condition(
               QField('chats.user_id'), QO.NEQ, QField('chats.receiver_id'))
-        ]);
+        ])
+        .orderBy(QOrder('chats.id', desc: false));
     var queryResult = await db.execute(sql);
     queryResult.assoc.forEach((row) {
       res.add(Chat(row).assoc);
