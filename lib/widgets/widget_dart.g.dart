@@ -150,7 +150,6 @@ var mapTemplates = {
   crossorigin="anonymous"
 ></script>
 <script src="/assets/app.js"></script>
-<script src="/assets/effects/wave/wave.js"></script>
 {{ assets.dataJs() }}
 {{ assets.js() }}
 """,

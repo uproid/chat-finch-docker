@@ -3,11 +3,36 @@ import AddChannelButton from './AddChannelButton.vue';
 import HomeSidebarChannels from './HomeSidebarChannels.vue';
 import HomeSidebarUsers from './HomeSidebarUsers.vue';
 
+const props = defineProps<{ open?: boolean }>();
+const emit = defineEmits(['close']);
 </script>
 
 <template>
+    <!-- Mobile backdrop -->
+    <Transition name="fade">
+        <div
+            v-if="open"
+            class="fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm lg:hidden"
+            @click="emit('close')"
+        />
+    </Transition>
+
+    <!-- Sidebar panel -->
     <aside
-        class="relative hidden w-80 shrink-0 border-e border-white/10 bg-slate-900/55 px-5 py-6 lg:flex lg:flex-col lg:backdrop-blur-2xl">
+        :class="[
+            'fixed inset-y-0 start-0 z-50 flex w-80 shrink-0 flex-col border-e border-white/10 bg-slate-900/95 px-5 py-6 backdrop-blur-2xl transition-transform duration-300',
+            'lg:static lg:translate-x-0',
+            open ? 'translate-x-0' : '-translate-x-full'
+        ]">
+
+        <!-- Mobile close button -->
+        <button
+            class="absolute end-4 top-4 flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white/70 transition hover:bg-white/20 lg:hidden"
+            @click="emit('close')"
+        >
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
         <div
             class="rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 to-white/[0.04] px-5 py-5 shadow-[0_30px_60px_-40px_rgba(2,6,23,0.95)]">
             <div class="flex items-start justify-between gap-4">
@@ -31,17 +56,28 @@ import HomeSidebarUsers from './HomeSidebarUsers.vue';
                 <div>
                     <p class="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-slate-500">Channels</p>
                     <div class="text-sm" id="chat-sidebar-channels">
-                        <HomeSidebarChannels />
+                        <HomeSidebarChannels @link-click="emit('close')" />
                     </div>
                 </div>
 
                 <div>
                     <p class="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-slate-500">Direct Messages</p>
                     <div class="space-y-2 text-sm">
-                        <HomeSidebarUsers />
+                        <HomeSidebarUsers @link-click="emit('close')" />
                     </div>
                 </div>
             </div>
         </div>
     </aside>
 </template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+</style>
