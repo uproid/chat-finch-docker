@@ -19,6 +19,7 @@ FinchConfigs configs = FinchConfigs(
   widgetsPath: pathTo(env['WIDGETS_PATH'] ?? "./lib/widgets"),
   widgetsType: env['WIDGETS_TYPE'] ?? 'j2.html',
   languagePath: pathTo(env['LANGUAGE_PATH'] ?? "./lib/languages"),
+  pathMigrationMySQL: env['MIGRATION_MYSQL'] ?? "./migrations",
   languageSource: LanguageSource.dart,
   dartLanguages: languageDart,
   publicDir: pathTo(env['PUBLIC_DIR'] ?? './public'),
