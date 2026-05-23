@@ -770,6 +770,10 @@ video {
   height: 1.75rem;
 }
 
+.h-dvh {
+  height: 100dvh;
+}
+
 .min-h-0 {
   min-height: 0px;
 }
@@ -1382,6 +1386,14 @@ video {
 
 .pb-16 {
   padding-bottom: 4rem;
+}
+
+.pb-20 {
+  padding-bottom: 5rem;
+}
+
+.pt-2 {
+  padding-top: 0.5rem;
 }
 
 .text-center {

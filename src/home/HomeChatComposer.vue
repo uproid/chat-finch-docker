@@ -10,7 +10,7 @@ const sidebarOpen = ref(false);
 
 <template>
   <div
-    class="relative flex h-screen w-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(16,185,129,0.2),_transparent_22%),radial-gradient(circle_at_bottom_right,_rgba(56,189,248,0.12),_transparent_24%),linear-gradient(135deg,_#020617,_#0f172a_40%,_#111827)]">
+    class="relative flex h-dvh w-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(16,185,129,0.2),_transparent_22%),radial-gradient(circle_at_bottom_right,_rgba(56,189,248,0.12),_transparent_24%),linear-gradient(135deg,_#020617,_#0f172a_40%,_#111827)]">
     <div
       class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,_rgba(255,255,255,0.04),_transparent_30%,_transparent_70%,_rgba(15,23,42,0.25))]">
     </div>
@@ -52,7 +52,7 @@ const sidebarOpen = ref(false);
     <Sidebar :open="sidebarOpen" @close="sidebarOpen = false" />
 
     <main
-      class="relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-none pb-16 lg:border-s lg:border-white/10 lg:bg-white/[0.04] lg:pb-0 lg:backdrop-blur-2xl">
+      class="relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-none pb-20 lg:border-s lg:border-white/10 lg:bg-white/[0.04] lg:pb-0 lg:backdrop-blur-2xl">
 
       <!-- Mobile top bar -->
       <header
@@ -70,7 +70,8 @@ const sidebarOpen = ref(false);
 
     <!-- Mobile bottom navigation bar -->
     <nav
-      class="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-white/10 bg-slate-950/90 px-2 py-2 backdrop-blur-xl lg:hidden">
+      class="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-white/10 bg-slate-950/90 px-2 pt-2 backdrop-blur-xl lg:hidden"
+      style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom))">
       <button
         @click="sidebarOpen = true"
         class="flex flex-col items-center gap-1 rounded-xl px-4 py-1.5 text-white/60 transition hover:text-white">
