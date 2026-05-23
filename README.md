@@ -1,165 +1,90 @@
-### Run
+# Chat App — Finch Framework (Dart)
 
-```shel
+A real-time chat example application built with the [Finch](https://pub.dev/packages/finch) web framework for Dart. It demonstrates WebSocket-based messaging, channel management, user authentication, MySQL persistence, and Jinja2 (`.j2.html`) templating — all running inside Docker.
+
+**GitHub:** [https://github.com/uproid/chat-finch-docker](https://github.com/uproid/chat-finch-docker)
+
+---
+
+## Features
+
+- User registration and login with session-based authentication
+- Real-time messaging via WebSockets (channels + direct messages)
+- Channel creation and management
+- MySQL database with automatic migrations
+- Jinja2 HTML templating with TailwindCSS
+- Static assets served via Nginx
+- Hot-reload during development via `finch serve`
+
+## Project Structure
+
+```
+lib/
+  app.dart                  # App entry point
+  configs/setting.dart      # FinchConfigs (MySQL, ports, paths)
+  controllers/              # Auth, home, workspace controllers
+  db/                       # MySQL table helpers (users, channels, chats)
+  models/                   # Dart models (User, Channel, Chat)
+  route/
+    web_route.dart          # HTTP routes
+    socket_route.dart       # WebSocket event handlers
+  widgets/                  # Jinja2 HTML templates
+  languages/                # i18n (English)
+migrations/                 # MySQL migration SQL files
+public/                     # Static assets (JS, CSS)
+docker/nginx.conf           # Nginx reverse proxy config
+```
+
+## Services (Docker Compose)
+
+| Service       | Description                              | Port        |
+|---------------|------------------------------------------|-------------|
+| `finch-chat`  | Dart/Finch app server                    | 2020, 2121  |
+| `mysql`       | MySQL 8 database                         | 3306        |
+| `nginx`       | Reverse proxy / static file serving      | 2222        |
+| `nodejs`      | TailwindCSS watcher (dev)                | —           |
+
+## Requirements
+
+- [Docker](https://www.docker.com/) & Docker Compose
+
+## Run
+
+```shell
 docker compose up --build
 ```
 
-## Examples
-  Please refer to the documentation and the GitHub page for a comprehensive review of the examples. You can also view the example as a [Demo](https://example.uproid.com).
+The app will be available at [http://localhost:2020](http://localhost:2020).
 
-### [View Examples](https://github.com/uproid/finch/tree/master/example)  |  [Live Demo](https://example.uproid.com) | [Documentations](https://github.com/uproid/finch/tree/master/doc)
+## Environment Variables
 
-```dart
-import 'package:finch/finch_console.dart';
-import 'package:finch/finch_app.dart';
-import 'package:finch/finch_tools.dart';
-import 'package:finch/finch_route.dart';
-import 'package:finch/finch_capp.dart';
-import 'lib/route/socket_route.dart';
-import 'lib/route/web_route.dart';
+The following variables can be configured (defaults shown):
 
-FinchConfigs configs = FinchConfigs(
-  widgetsPath: pathTo(env['WIDGETS_PATH'] ?? "./lib/widgets"),
-  widgetsType: env['WIDGETS_TYPE'] ?? 'j2.html',
-  languagePath: pathTo(env['LANGUAGE_PATH'] ?? "./lib/languages"),
-  publicDir: pathTo(env['PUBLIC_DIR'] ?? './public'),
-  dbConfig: FinchDBConfig(
-    enable: true,
-    dbName: 'example',
-    auth: 'admin',
-    pass: 'PasswordMongoDB',
-    host: env['MONGO_CONNECTION'] ?? 'localhost',
-    port: env['MONGO_PORT'] ?? '27018',
-    user: 'root',
-  ),
-  port: (env['DOMAIN_PORT'] ?? '2020').toInt(def: 2020),
-  mysqlConfig: FinchMysqlConfig(
-    enable: true,
-    host: env['MYSQL_HOST'] ?? 'localhost',
-    port: 3306,
-    user: 'example_user',
-    pass: 'example_password',
-    databaseName: 'example_db',
-  ),
+| Variable          | Default           | Description                  |
+|-------------------|-------------------|------------------------------|
+| `DOMAIN_PORT`     | `2020`            | HTTP port for the app        |
+| `MYSQL_HOST`      | `localhost`       | MySQL host                   |
+| `MYSQL_PORT`      | `3306`            | MySQL port                   |
+| `MYSQL_USER`      | `example_user`    | MySQL username               |
+| `MYSQL_PASSWORD`  | `example_password`| MySQL password               |
+| `MYSQL_DATABASE`  | `example_db`      | MySQL database name          |
+| `WIDGETS_PATH`    | `./lib/widgets`   | Path to Jinja2 templates     |
+| `PUBLIC_DIR`      | `./public`        | Path to static assets        |
 
-  /// Enable local debugger
-  enableLocalDebugger: (env['ENABLE_LOCAL_DEBUGGER'] ?? true).toString().toBool,
+## WebSocket Events
 
-  /// SQLite configuration
-  sqliteConfig: FinchSqliteConfig(
-    enable: true,
-    filePath: env['SQLITE_PATH'] ?? './example_database.sqlite',
-  ),
-);
+| Event                  | Direction      | Description                          |
+|------------------------|----------------|--------------------------------------|
+| `channels`             | client → server| Fetch all channels                   |
+| `new_channel`          | client → server| Create a new channel                 |
+| `users`                | client → server| Fetch all users                      |
+| `channel_chats`        | client → server| Fetch messages for a channel         |
+| `send_chat`            | client → server| Send a message to a channel          |
+| `send_message_to_user` | client → server| Send a direct message to a user      |
+| `users_messages`       | client → server| Fetch direct messages between users  |
 
-final app = FinchApp(configs: configs);
+## Links
 
-final socketManager = SocketManager(
-  app,
-  event: SocketEvent(
-    onConnect: (socket) {
-      app.socketManager?.sendToAll(
-        "New user connected! count: ${app.socketManager?.countClients}",
-        path: "output",
-      );
-      socket.send(
-        {'message': 'Soccuess connect to socket!'},
-        path: 'connected',
-      );
-    },
-    onMessage: (socket, data) {},
-    onDisconnect: (socket) {
-      var count = app.socketManager?.countClients ?? 0;
-      app.socketManager?.sendToAll(
-        "User disconnected! count: ${count - 1}",
-        path: "output",
-      );
-    },
-  ),
-  routes: getSocketRoute(),
-);
-
-void main([List<String>? args]) async {
-  /// Example Web Route
-  app.addRouting(getWebRoute);
-
-  /// Add custom commands
-  app.commands.add(
-    CappController('example', options: [
-      CappOption(
-        name: 'test',
-        shortName: 't',
-        description: 'An example option',
-      ),
-    ], run: (c) async {
-      if (c.existsOption('test')) {
-        CappConsole.writeTable(
-          [
-            ['Column 1', 'Column 2', 'Column 3'],
-            ...List.filled(5, ['Data 1', 'Data 2', 'Data 3'])
-          ],
-          dubleBorder: true,
-          color: CappColors.warning,
-        );
-      }
-
-      return CappConsole(
-        'This is an example command from Finch App! Time: ${DateTime.now()}',
-        CappColors.success,
-      );
-    }),
-  );
-
-  /// Or add routes directly one by one
-  app
-    ..get(
-      path: '/get',
-      index: (rq) async {
-        return rq.renderString(text: 'Hello from ${rq.method} /get request!');
-      },
-    )
-    ..postGet(
-      path: '/post',
-      index: (rq) async {
-        return rq.renderString(text: 'Hello from ${rq.method} /post request!');
-      },
-    );
-
-  Request.localEvents.addAll(localEvents);
-  Request.addLocalLayoutFilters(localLayoutFilters);
-  app.start(args).then((value) {
-    Console.p("Example app started: http://localhost:${value.port}");
-  });
-
-  /// Example Cron job
-  app.registerCron(
-    /// Evry 2 days clean the example collection of database
-    FinchCron(
-      schedule: FinchCron.evryDay(2),
-      onCron: (index, cron) async {
-        if (app.mongoDb.isConnected) {
-          ExampleCollections().deleteAll();
-        }
-      },
-      delayFirstMoment: true,
-    ).start(),
-  );
-
-  app.registerCron(
-    /// Add evry hour a new document to the example collection of database
-    FinchCron(
-      schedule: "0 * * * *",
-      onCron: (index, cron) async {
-        if (app.mongoDb.isConnected) {
-          ExampleCollections().insertExample(ExampleModel(
-            title: DateTime.now().toString(),
-            slug: 'slug-$index',
-          ));
-        }
-      },
-      delayFirstMoment: true,
-    ).start(),
-  );
-}
-
-```
+- [Finch Framework](https://pub.dev/packages/finch)
+- [Finch on GitHub](https://github.com/uproid/finch)
+- [Finch Documentation](https://github.com/uproid/finch/tree/master/doc)
