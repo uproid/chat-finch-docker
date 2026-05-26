@@ -29,8 +29,10 @@ class ChatsTable extends MysqlTable {
   }
 
   Future<List<Map<String, dynamic>>> getChatsByChannelId(
-    String channelId,
-  ) async {
+    String channelId, {
+    required int page,
+    int pageSize = 20,
+  }) async {
     var res = <Map<String, dynamic>>[];
 
     Sqler sql = Sqler()
@@ -66,7 +68,9 @@ class ChatsTable extends MysqlTable {
           ]),
           as: 'channel',
         ))
-        .whereOne(QField('chats.channel_id'), QO.EQ, QVar(channelId));
+        .whereOne(QField('chats.channel_id'), QO.EQ, QVar(channelId))
+        .orderBy(QOrder('chats.id', desc: true))
+        .limit(pageSize, (page - 1) * pageSize);
 
     var queryResult = await db.execute(sql);
     queryResult.assoc.forEach((row) {
@@ -75,7 +79,11 @@ class ChatsTable extends MysqlTable {
     return res;
   }
 
-  Future<List<Map<String, dynamic>>> getOneChatUsers(List users) async {
+  Future<List<Map<String, dynamic>>> getOneChatUsers(
+    List users, {
+    required int page,
+    int pageSize = 20,
+  }) async {
     var res = <Map<String, dynamic>>[];
 
     Sqler sql = Sqler()
@@ -108,7 +116,8 @@ class ChatsTable extends MysqlTable {
           Condition(
               QField('chats.user_id'), QO.NEQ, QField('chats.receiver_id'))
         ])
-        .orderBy(QOrder('chats.id', desc: false));
+        .orderBy(QOrder('chats.id', desc: true))
+        .limit(pageSize, (page - 1) * pageSize);
     var queryResult = await db.execute(sql);
     queryResult.assoc.forEach((row) {
       res.add(Chat(row).assoc);

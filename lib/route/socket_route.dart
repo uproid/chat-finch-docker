@@ -52,22 +52,35 @@ Map<String, SocketEvent> getSocketRoute() {
     'channel_chats': SocketEvent(
       onMessage: (socket, payload) async {
         var data = payload['data'];
-        var chats = await ChatsTable().getChatsByChannelId(data['channel_id']);
-        socket.send({'items': chats}, path: 'channel_chats');
+        var page = (data['page'] ?? 1) as int;
+        var channelId = data['channel_id'].toString();
+        var chats =
+            await ChatsTable().getChatsByChannelId(channelId, page: page);
+        socket.send({
+          'items': chats,
+          'page': page,
+          'channel_id': channelId,
+        }, path: 'channel_chats');
       },
     ),
     'send_chat': SocketEvent(
       onMessage: (socket, payload) async {
         var data = payload['data'];
+        var channelId = data['channel_id'].toString();
         var res = await ChatsTable().insertChat(
           userId: data['user_id'],
           message: data['message'],
           receiverId: data['receiver_id'],
-          channelId: data['channel_id'],
+          channelId: channelId,
         );
 
-        var chats = await ChatsTable().getChatsByChannelId(data['channel_id']);
-        socket.manager.sendToAll({'items': chats}, path: 'channel_chats');
+        // Always broadcast page 1 so all clients reset to latest messages
+        var chats = await ChatsTable().getChatsByChannelId(channelId, page: 1);
+        socket.manager.sendToAll({
+          'items': chats,
+          'page': 1,
+          'channel_id': channelId,
+        }, path: 'channel_chats');
 
         socket.send(
           {'new_chat': res},
@@ -77,9 +90,15 @@ Map<String, SocketEvent> getSocketRoute() {
     ),
     'users_messages': SocketEvent(
       onMessage: (socket, payload) async {
-        var users = payload['data']['users'] ?? [];
-        var messages = await ChatsTable().getOneChatUsers(users);
-        socket.send({'items': messages}, path: 'users_messages');
+        var data = payload['data'];
+        var users = data['users'] ?? [];
+        var page = (data['page'] ?? 1) as int;
+        var messages = await ChatsTable().getOneChatUsers(users, page: page);
+        socket.send({
+          'items': messages,
+          'page': page,
+          'users': users,
+        }, path: 'users_messages');
       },
     ),
     'send_message_to_user': SocketEvent(
@@ -88,20 +107,26 @@ Map<String, SocketEvent> getSocketRoute() {
         var secretChat = socket.rq.getCookie('chat_secret', safe: true);
         print(secretChat);
         var senderUser = await UsersTable().getUserBySecret(secretChat);
-        var receiverUser = data['to'];
+        var receiverUser = data['to'].toString();
 
-        ChatsTable()
-            .insertChat(
+        await ChatsTable().insertChat(
           userId: senderUser!.id,
           message: data['message'],
           receiverId: receiverUser,
-        )
-            .then((_) async {
-          socket.manager
-              .sendToUser(senderUser.id, {}, path: 'new_message_from_user');
-          socket.manager
-              .sendToUser(receiverUser, {}, path: 'new_message_from_user');
-        });
+        );
+
+        // Broadcast page 1 to both participants so their pagination resets
+        var users = [senderUser.id, receiverUser];
+        var messages = await ChatsTable().getOneChatUsers(users, page: 1);
+        var responseData = {
+          'items': messages,
+          'page': 1,
+          'users': users,
+        };
+        socket.manager
+            .sendToUser(senderUser.id, responseData, path: 'users_messages');
+        socket.manager
+            .sendToUser(receiverUser, responseData, path: 'users_messages');
       },
     ),
   };

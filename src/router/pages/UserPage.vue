@@ -1,36 +1,161 @@
 <script setup>
-import { ref, watch, nextTick } from 'vue';
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { addSocketEvent, finchSocket, initWebSocket } from '../../home/socket_client';
+import { useInfiniteScroll } from '@vueuse/core';
+import { addSocketEvent, initWebSocket } from '../../home/socket_client';
 import { myID } from '../../utility/helper';
 import Message from '../../components/Message.vue';
 
 const route = useRoute();
 const draft = ref('');
 const messages = ref([]);
-const profile = ref(null);
 const scrollEl = ref(null);
-const myId = ref(myID());
+
+// Pagination state
+const currentUsers = ref([]);
+const nextPage = ref(2);
+const hasMore = ref(true);
+
+// Holds the resolve() of the Promise useInfiniteScroll is waiting on
+let resolvePendingLoad = null;
+
+// ── Scroll helpers ────────────────────────────────────────────────────────────
 
 function scrollToBottom() {
   nextTick(() => {
-    if (scrollEl.value) scrollEl.value.scrollTop = scrollEl.value.scrollHeight;
+    requestAnimationFrame(() => {
+      if (scrollEl.value) {
+        scrollEl.value.scrollTop = scrollEl.value.scrollHeight;
+      }
+    });
   });
 }
-function loadUser(id) {
-  messages.value = [];
-  profile.value = null;
-  finchSocket('users_messages', { users: [id, myID()] }, (payload) => {
-    messages.value = payload.data.items ?? [];
+
+function preserveScrollAfterPrepend(prevScrollHeight) {
+  nextTick(() => {
+    if (scrollEl.value) {
+      scrollEl.value.scrollTop = scrollEl.value.scrollHeight - prevScrollHeight;
+    }
+  });
+}
+
+// ── Conversation identity helpers ─────────────────────────────────────────────
+// A DM conversation is identified by the sorted pair of participant IDs.
+
+function conversationKey(users) {
+  return users.map(String).sort().join(',');
+}
+
+function currentKey() {
+  return conversationKey([myID(), route.params.id]);
+}
+
+// ── Central users_messages handler ───────────────────────────────────────────
+// Registered once; handles both real-time updates (page 1) and pagination (page N).
+
+function handleUsersMessages(payload) {
+  const data = payload.data ?? {};
+  const items = data.items ?? [];
+  const page = data.page ?? 1;
+  const users = data.users ?? [];
+
+  // Discard responses that belong to a different conversation
+  if (conversationKey(users) !== currentKey()) return;
+
+  if (page === 1) {
+    // Initial load or real-time update (new message sent) — replace and reset.
+    // Server returns newest-first (DESC); reverse so oldest is at top, newest at bottom.
+    messages.value = items.slice().reverse();
+    hasMore.value = items.length > 0;
+    nextPage.value = 2;
     scrollToBottom();
+
+    // Unblock any in-progress pagination
+    if (resolvePendingLoad) {
+      resolvePendingLoad();
+      resolvePendingLoad = null;
+    }
+  } else {
+    // Paginated response: prepend older messages while keeping scroll position
+    if (items.length === 0) {
+      hasMore.value = false;
+    } else {
+      const prevScrollHeight = scrollEl.value?.scrollHeight ?? 0;
+      messages.value = [...items.slice().reverse(), ...messages.value];
+      preserveScrollAfterPrepend(prevScrollHeight);
+      nextPage.value = page + 1;
+    }
+
+    if (resolvePendingLoad) {
+      resolvePendingLoad();
+      resolvePendingLoad = null;
+    }
+  }
+}
+
+let removeUsersMessagesHandler = null;
+
+onMounted(() => {
+  removeUsersMessagesHandler = addSocketEvent('users_messages', handleUsersMessages);
+});
+
+onUnmounted(() => {
+  if (removeUsersMessagesHandler) {
+    removeUsersMessagesHandler();
+    removeUsersMessagesHandler = null;
+  }
+  if (resolvePendingLoad) {
+    resolvePendingLoad();
+    resolvePendingLoad = null;
+  }
+});
+
+// ── Conversation loading ──────────────────────────────────────────────────────
+
+function loadUser(id) {
+  if (resolvePendingLoad) {
+    resolvePendingLoad();
+    resolvePendingLoad = null;
+  }
+
+  currentUsers.value = [myID(), id];
+  messages.value = [];
+  nextPage.value = 2;
+  hasMore.value = true;
+
+  initWebSocket({
+    path: 'users_messages',
+    data: { users: [id, myID()], page: 1 },
   });
 }
 
 loadUser(route.params.id);
 watch(() => route.params.id, (id) => loadUser(id));
-addSocketEvent('new_message_from_user', (socket, payload) => {
-  loadUser(route.params.id);
-});
+
+// ── Infinite scroll (reverse — triggers when scrolled near the top) ───────────
+
+const { isLoading: isPaginating } = useInfiniteScroll(
+  scrollEl,
+  () =>
+    new Promise((resolve) => {
+      if (!hasMore.value) {
+        resolve();
+        return;
+      }
+      resolvePendingLoad = resolve;
+      initWebSocket({
+        path: 'users_messages',
+        data: { users: currentUsers.value, page: nextPage.value },
+      });
+    }),
+  {
+    direction: 'top',
+    distance: 80,
+    canLoadMore: () => hasMore.value,
+  },
+);
+
+// ── Message composer ─────────────────────────────────────────────────────────
 
 function sendMessage() {
   const text = draft.value.trim();
@@ -39,9 +164,9 @@ function sendMessage() {
     path: 'send_message_to_user',
     data: { to: route.params.id, message: text },
   });
-
-
   draft.value = '';
+  // Pagination reset is handled automatically when the server broadcasts
+  // users_messages page=1 to both participants.
 }
 </script>
 
@@ -69,6 +194,21 @@ function sendMessage() {
     <div
       ref="scrollEl"
       class="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6 lg:px-8 scrollbar-thin scrollbar-track-slate-900/20 scrollbar-thumb-slate-700/80 hover:scrollbar-thumb-slate-600">
+
+      <!-- End-of-history indicator -->
+      <div v-if="!hasMore && messages.length > 0"
+        class="mb-4 flex items-center gap-3 text-xs text-slate-500">
+        <div class="h-px flex-1 bg-white/5"></div>
+        <span>Beginning of conversation</span>
+        <div class="h-px flex-1 bg-white/5"></div>
+      </div>
+
+      <!-- Loading older messages spinner -->
+      <div v-if="isPaginating && messages.length > 0"
+        class="mb-4 flex justify-center">
+        <span class="fa fa-circle-notch fa-spin text-sky-400/60 text-sm"></span>
+      </div>
+
       <div v-if="messages.length === 0" class="flex h-full items-center justify-center text-slate-500 text-sm">
         No messages yet — start the conversation.
       </div>

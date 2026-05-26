@@ -76,6 +76,14 @@ function addSocketEvent(key, event) {
         socketEvents[key] = [];
     }
     socketEvents[key].push(event);
+    // Return a cleanup function to remove this specific listener
+    return () => {
+        const list = socketEvents[key];
+        if (list) {
+            const idx = list.indexOf(event);
+            if (idx !== -1) list.splice(idx, 1);
+        }
+    };
 }
 
 function finchSocket(path, data, onReceive = null) {
