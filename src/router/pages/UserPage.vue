@@ -246,8 +246,12 @@ function sendMessage() {
     <!-- Composer -->
     <div class="border-t border-white/10 px-4 py-4 sm:px-6 lg:px-8">
       <div class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-        <input v-model="draft" @keydown.enter="sendMessage" :placeholder="`Message ${route.params.id}…`"
-          class="min-w-0 flex-1 bg-transparent text-sm text-slate-200 placeholder-slate-500 outline-none" />
+        <textarea v-model="draft"
+            @keydown.enter.exact.prevent="sendMessage"
+            :placeholder="`Message ${route.params.username}\u2026`"
+            rows="1"
+            @input="$event.target.style.height = 'auto'; $event.target.style.height = $event.target.scrollHeight + 'px'"
+            class="min-w-0 flex-1 resize-none overflow-hidden bg-transparent text-sm text-slate-200 placeholder-slate-500 outline-none" />
         <button @click="sendMessage"
           class="rounded-xl bg-sky-400 px-4 py-2 text-xs font-bold text-slate-950 transition hover:bg-sky-300">
           Send
