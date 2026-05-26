@@ -146,4 +146,32 @@ class ChatsTable extends MysqlTable {
     var queryResult = await db.execute(sqler);
     return queryResult.insertId;
   }
+
+  /// Returns { sender_user_id → unread_count } for messages addressed to [receiverId].
+  Future<Map<String, int>> getUnreadCountsForUser(String receiverId) async {
+    var sql = Sqler()
+        .selects([QSelect('user_id', as: 'user_id')])
+        .from(QField(tableName, as: 'chats'))
+        .whereAnd([
+          Condition(QField('receiver_id'), QO.EQ, QVar(receiverId)),
+          Condition(QField('is_read'), QO.EQ, QVar(0)),
+        ]);
+
+    var result = await db.execute(sql);
+    var counts = <String, int>{};
+    for (var row in result.assoc) {
+      final uid = row['user_id'].toString();
+      counts[uid] = (counts[uid] ?? 0) + 1;
+    }
+    return counts;
+  }
+
+  /// Marks all messages from [senderId] to [receiverId] as read.
+  Future<void> markAsRead(String receiverId, String senderId) async {
+    var sql = Sqler().update(qName).updateSet('is_read', QVar(1)).whereAnd([
+      Condition(QField('receiver_id'), QO.EQ, QVar(receiverId)),
+      Condition(QField('user_id'), QO.EQ, QVar(senderId)),
+    ]);
+    await db.execute(sql);
+  }
 }

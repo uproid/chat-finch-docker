@@ -70,6 +70,12 @@ function handleUsersMessages(payload) {
     nextPage.value = 2;
     scrollToBottom();
 
+    // Conversation is open — immediately mark incoming messages as read
+    initWebSocket({
+      path: 'mark_read',
+      data: { user_id: String(route.params.id) },
+    });
+
     // Unblock any in-progress pagination
     if (resolvePendingLoad) {
       resolvePendingLoad();
@@ -126,6 +132,12 @@ function loadUser(id) {
   initWebSocket({
     path: 'users_messages',
     data: { users: [id, myID()], page: 1 },
+  });
+
+  // Mark messages from this user as read; server will push updated unread_counts
+  initWebSocket({
+    path: 'mark_read',
+    data: { user_id: id },
   });
 }
 

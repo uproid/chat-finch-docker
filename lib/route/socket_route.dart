@@ -127,6 +127,44 @@ Map<String, SocketEvent> getSocketRoute() {
             .sendToUser(senderUser.id, responseData, path: 'users_messages');
         socket.manager
             .sendToUser(receiverUser, responseData, path: 'users_messages');
+
+        // Push fresh unread counts to the receiver so their sidebar badge updates
+        var receiverCounts =
+            await ChatsTable().getUnreadCountsForUser(receiverUser);
+        socket.manager.sendToUser(
+          receiverUser,
+          {'counts': receiverCounts},
+          path: 'unread_counts',
+        );
+      },
+    ),
+    'unread_counts': SocketEvent(
+      onMessage: (socket, payload) async {
+        var secretChat = socket.rq.getCookie('chat_secret', safe: true);
+        var currentUser = await UsersTable().getUserBySecret(secretChat);
+        if (currentUser == null) {
+          socket.send({'counts': {}}, path: 'unread_counts');
+          return;
+        }
+        var counts =
+            await ChatsTable().getUnreadCountsForUser(currentUser.id);
+        socket.send({'counts': counts}, path: 'unread_counts');
+      },
+    ),
+    'mark_read': SocketEvent(
+      onMessage: (socket, payload) async {
+        var data = payload['data'];
+        var secretChat = socket.rq.getCookie('chat_secret', safe: true);
+        var currentUser = await UsersTable().getUserBySecret(secretChat);
+        if (currentUser == null) return;
+
+        var senderId = data['user_id'].toString();
+        await ChatsTable().markAsRead(currentUser.id, senderId);
+
+        // Return updated counts so the sidebar badge clears immediately
+        var counts =
+            await ChatsTable().getUnreadCountsForUser(currentUser.id);
+        socket.send({'counts': counts}, path: 'unread_counts');
       },
     ),
   };
