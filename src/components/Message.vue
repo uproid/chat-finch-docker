@@ -20,7 +20,7 @@ const props = defineProps({
                 <h3 class="text-base font-extrabold text-white">{{ message.user_username }}</h3>
                 <span class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ message.created_at }}</span>
             </div>
-            <p class="mt-2 text-sm leading-7 text-slate-300 whitespace-pre-wrap">{{ message.message }}</p>
+            <p class="mt-2 text-sm leading-7 text-slate-300 whitespace-pre-wrap break-words">{{ message.message }}</p>
         </div>
     </article>
 </template>
