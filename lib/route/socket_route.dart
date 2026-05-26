@@ -146,8 +146,7 @@ Map<String, SocketEvent> getSocketRoute() {
           socket.send({'counts': {}}, path: 'unread_counts');
           return;
         }
-        var counts =
-            await ChatsTable().getUnreadCountsForUser(currentUser.id);
+        var counts = await ChatsTable().getUnreadCountsForUser(currentUser.id);
         socket.send({'counts': counts}, path: 'unread_counts');
       },
     ),
@@ -162,8 +161,7 @@ Map<String, SocketEvent> getSocketRoute() {
         await ChatsTable().markAsRead(currentUser.id, senderId);
 
         // Return updated counts so the sidebar badge clears immediately
-        var counts =
-            await ChatsTable().getUnreadCountsForUser(currentUser.id);
+        var counts = await ChatsTable().getUnreadCountsForUser(currentUser.id);
         socket.send({'counts': counts}, path: 'unread_counts');
       },
     ),
