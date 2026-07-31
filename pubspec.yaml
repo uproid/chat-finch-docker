@@ -15,7 +15,7 @@ dev_dependencies:
   json_serializable:
 
 dependencies:
-  finch: 1.3.2
+  finch: 1.5.0
     # path: ../
   watcher:
 

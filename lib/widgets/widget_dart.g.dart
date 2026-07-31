@@ -1,4 +1,59 @@
 var mapTemplates = {
+	r"forms/form_login.j2.html": r"""<form action="/login" method="post" class="space-y-5">
+    <input type="hidden" name="token" value="{{ $n('form_login/token/value') }}" />
+    {% if $n('form_login/token/error') %}
+    <span class="text-sm text-red-500 ms-2 flex items-center gap-1">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <p>{{ $n('form_login/token/error') | tr }}</p>
+    </span>
+    {% endif %}
+    <div class="space-y-2">
+        <label for="username" class="block text-sm font-bold text-slate-700">Username</label>
+        <div
+            class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 transition focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(16,185,129,0.12)]">
+            <i class="fa-regular fa-user text-slate-400"></i>
+            <input id="username" name="username" type="text" autocomplete="username" placeholder="Enter your username"
+                class="w-full border-0 bg-transparent p-0 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                value="{{ $n('form_login/username/value') }}">
+        </div>
+        {% if $n('form_login/username/error') %}
+        <span class="text-sm text-red-500 ms-2 flex items-center gap-1">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <p>{{ $n('form_login/username/error') | tr }}</p>
+        </span>
+        {% endif %}
+    </div>
+
+    <div class="space-y-2">
+        <div class="flex items-center justify-between gap-3">
+            <label for="password" class="block text-sm font-bold text-slate-700">Password</label>
+            <a href="/register"
+                class="text-xs font-bold uppercase tracking-[0.24em] text-emerald-700 transition hover:text-emerald-500">
+                Register now
+            </a>
+        </div>
+        <div
+            class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 transition focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(16,185,129,0.12)]">
+            <i class="fa-solid fa-key text-slate-400"></i>
+            <input id="password" name="password" type="password" autocomplete="current-password"
+                placeholder="Enter your password"
+                class="w-full border-0 bg-transparent p-0 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                value="{{ $n('form_login/password/value') }}">
+        </div>
+        {% if $n('form_login/password/error') %}
+        <span class="text-sm text-red-500 ms-2 flex items-center gap-1">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <p>{{ $n('form_login/password/error') | tr }}</p>
+        </span>
+        {% endif %}
+    </div>
+
+    <button type="submit"
+        class="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-5 py-4 text-sm font-extrabold uppercase tracking-[0.2em] text-white transition hover:-translate-y-0.5 hover:bg-emerald-600 focus:outline-none focus:ring-4 focus:ring-emerald-200">
+        Login
+        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+    </button>
+</form>""",
 	r"forms/form_register.j2.html": r"""<form action="/register" method="post" class="space-y-5">
     <input type="hidden" name="token" value="{{ $n('form_register/token/value') }}" />
     {% if $n('form_register/token/error') %}
@@ -85,61 +140,6 @@ var mapTemplates = {
         <i class="fa-solid fa-arrow-right-to-bracket"></i>
     </button>
 </form>""",
-	r"forms/form_login.j2.html": r"""<form action="/login" method="post" class="space-y-5">
-    <input type="hidden" name="token" value="{{ $n('form_login/token/value') }}" />
-    {% if $n('form_login/token/error') %}
-    <span class="text-sm text-red-500 ms-2 flex items-center gap-1">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-        <p>{{ $n('form_login/token/error') | tr }}</p>
-    </span>
-    {% endif %}
-    <div class="space-y-2">
-        <label for="username" class="block text-sm font-bold text-slate-700">Username</label>
-        <div
-            class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 transition focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(16,185,129,0.12)]">
-            <i class="fa-regular fa-user text-slate-400"></i>
-            <input id="username" name="username" type="text" autocomplete="username" placeholder="Enter your username"
-                class="w-full border-0 bg-transparent p-0 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
-                value="{{ $n('form_login/username/value') }}">
-        </div>
-        {% if $n('form_login/username/error') %}
-        <span class="text-sm text-red-500 ms-2 flex items-center gap-1">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            <p>{{ $n('form_login/username/error') | tr }}</p>
-        </span>
-        {% endif %}
-    </div>
-
-    <div class="space-y-2">
-        <div class="flex items-center justify-between gap-3">
-            <label for="password" class="block text-sm font-bold text-slate-700">Password</label>
-            <a href="/register"
-                class="text-xs font-bold uppercase tracking-[0.24em] text-emerald-700 transition hover:text-emerald-500">
-                Register now
-            </a>
-        </div>
-        <div
-            class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 transition focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(16,185,129,0.12)]">
-            <i class="fa-solid fa-key text-slate-400"></i>
-            <input id="password" name="password" type="password" autocomplete="current-password"
-                placeholder="Enter your password"
-                class="w-full border-0 bg-transparent p-0 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
-                value="{{ $n('form_login/password/value') }}">
-        </div>
-        {% if $n('form_login/password/error') %}
-        <span class="text-sm text-red-500 ms-2 flex items-center gap-1">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            <p>{{ $n('form_login/password/error') | tr }}</p>
-        </span>
-        {% endif %}
-    </div>
-
-    <button type="submit"
-        class="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-5 py-4 text-sm font-extrabold uppercase tracking-[0.2em] text-white transition hover:-translate-y-0.5 hover:bg-emerald-600 focus:outline-none focus:ring-4 focus:ring-emerald-200">
-        Login
-        <i class="fa-solid fa-arrow-right-to-bracket"></i>
-    </button>
-</form>""",
 	r"footer.j2.html": r"""<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
 <script
   src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
@@ -153,75 +153,6 @@ var mapTemplates = {
 {{ assets.dataJs() }}
 {{ assets.js() }}
 """,
-	r"base/auth.base.j2.html": r"""<!DOCTYPE html>
-<html lang="{{ $e.ln }}" dir="{{ $t('dir') }}" class="h-full overflow-x-hidden">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}{% endblock %} | {{ $t(title ?? 'Finch Chat') }}</title>
-  <meta name="robots" content="noindex, nofollow">
-  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="/assets/generated-tailwind.css" />
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-  {% block stylesheets %}
-  {{ assets.css() }}
-  {% endblock %}
-</head>
-
-<body class="h-full bg-gray-50 font-sans antialiased overflow-x-hidden">
-  <div class="flex min-h-screen w-screen max-w-full bg-gradient-to-br from-gray-50 to-blue-50/30 overflow-x-hidden">
-    <!-- Main Component -->
-      <main class="content flex-1 px-4 py-6 mt-16 lg:px-8 lg:py-8 w-full min-w-0">
-        <div class="mx-auto w-full max-w-7xl min-w-0">
-          {% block content %}
-          {% endblock %}
-        </div>
-      </main>
-  </div>
-
-  {% block footer %}
-  {% include 'footer.j2.html' %}
-  {% endblock %}
-
-  {% block script %}{% endblock %}
-</body>
-</html>""",
-	r"base/chat.base.j2.html": r"""<!DOCTYPE html>
-<html lang="{{ $e.ln }}" dir="{{ $t('dir') }}" class="h-full overflow-hidden">
-
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-	<title>{% block title %}Chat{% endblock %} | {{ $t(title ?? 'Finch') }}</title>
-	<meta name="robots" content="noindex, nofollow">
-	<link rel="icon" href="/favicon.ico" type="image/x-icon">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-	<link rel="stylesheet" href="/assets/generated-tailwind.css">
-	<link rel="stylesheet" href="/assets/app.css" crossorigin="anonymous">
-	<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-		integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-	{% block stylesheets %}
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
-		rel="stylesheet">
-	{{ assets.css() }}
-	{% endblock %}
-</head>
-
-<body  class="h-full overflow-hidden bg-slate-950 font-sans antialiased text-slate-100">
-	<div id="chat-home-vue"></div>
-
-	{% block footer %}
-	{% include 'footer.j2.html' %}
-	{% endblock %}
-
-	<script type="module" src="/assets/vue/home.js"></script>
-</body>
-
-</html>""",
 	r"home.j2.html": r"""{% extends 'base/chat.base.j2.html' %}
 """,
 	r"register.j2.html": r"""{% extends 'base/auth.base.j2.html' %}
@@ -384,5 +315,74 @@ var mapTemplates = {
     </div>
 </section>
 {% endblock %}
-"""
+""",
+	r"base/chat.base.j2.html": r"""<!DOCTYPE html>
+<html lang="{{ $e.ln }}" dir="{{ $t('dir') }}" class="h-full overflow-hidden">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+	<title>{% block title %}Chat{% endblock %} | {{ $t(title ?? 'Finch') }}</title>
+	<meta name="robots" content="noindex, nofollow">
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+	<link rel="stylesheet" href="/assets/generated-tailwind.css">
+	<link rel="stylesheet" href="/assets/app.css" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+		integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+	{% block stylesheets %}
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+		rel="stylesheet">
+	{{ assets.css() }}
+	{% endblock %}
+</head>
+
+<body  class="h-full overflow-hidden bg-slate-950 font-sans antialiased text-slate-100">
+	<div id="chat-home-vue"></div>
+
+	{% block footer %}
+	{% include 'footer.j2.html' %}
+	{% endblock %}
+
+	<script type="module" src="/assets/vue/home.js"></script>
+</body>
+
+</html>""",
+	r"base/auth.base.j2.html": r"""<!DOCTYPE html>
+<html lang="{{ $e.ln }}" dir="{{ $t('dir') }}" class="h-full overflow-x-hidden">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}{% endblock %} | {{ $t(title ?? 'Finch Chat') }}</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/assets/generated-tailwind.css" />
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  {% block stylesheets %}
+  {{ assets.css() }}
+  {% endblock %}
+</head>
+
+<body class="h-full bg-gray-50 font-sans antialiased overflow-x-hidden">
+  <div class="flex min-h-screen w-screen max-w-full bg-gradient-to-br from-gray-50 to-blue-50/30 overflow-x-hidden">
+    <!-- Main Component -->
+      <main class="content flex-1 px-4 py-6 mt-16 lg:px-8 lg:py-8 w-full min-w-0">
+        <div class="mx-auto w-full max-w-7xl min-w-0">
+          {% block content %}
+          {% endblock %}
+        </div>
+      </main>
+  </div>
+
+  {% block footer %}
+  {% include 'footer.j2.html' %}
+  {% endblock %}
+
+  {% block script %}{% endblock %}
+</body>
+</html>"""
 };

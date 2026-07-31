@@ -17,7 +17,7 @@ services:
     stdin_open: true
 
   nodejs:
-    image: node:20-alpine
+    image: node:23-alpine
     working_dir: /app
     tty: true
     stdin_open: true
