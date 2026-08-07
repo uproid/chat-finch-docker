@@ -1,2 +1,6 @@
 pubspec.lock
 ./dart_tool/
+mysql/
+node_modules/
+.git/
+dist/
