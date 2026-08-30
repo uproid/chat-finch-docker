@@ -13,7 +13,7 @@ ENV WIDGETS_PATH=./lib/widgets
 ENV WIDGETS_TYPE=j2.html
 ENV LANGUAGE_PATH=./lib/languages
 ENV PUBLIC_DIR=./public
-ENV LOCAL_DEBUG=true
+ENV LOCAL_DEBUG=false
 ENV ENABLE_DATABASE=true
 
 COPY . .
