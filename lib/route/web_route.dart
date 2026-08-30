@@ -8,7 +8,7 @@ final authController = AppAuthController();
 final includeController = IncludeJsController();
 final workspaceController = WorkspaceController();
 
-Future<List<FinchRoute>> getWebRoute(Request rq) async {
+Future<List<FinchRoute>> getWebRoute() async {
   var paths = <FinchRoute>[
     FinchRoute(
       path: '/',

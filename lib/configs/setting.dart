@@ -16,29 +16,26 @@ class Setting {
 
 FinchConfigs configs = FinchConfigs(
   jinjaMapTemplate: mapTemplates,
-  widgetsPath: pathTo(env['WIDGETS_PATH'] ?? "./lib/widgets"),
-  widgetsType: env['WIDGETS_TYPE'] ?? 'j2.html',
-  languagePath: pathTo(env['LANGUAGE_PATH'] ?? "./lib/languages"),
-  pathMigrationMySQL: env['MIGRATION_MYSQL'] ?? "./migrations",
+  widgetsPath: pathTo(env.get('WIDGETS_PATH', "./lib/widgets")),
+  widgetsType: env.get('WIDGETS_TYPE', 'j2.html'),
+  languagePath: pathTo(env.get('LANGUAGE_PATH', "./lib/languages")),
+  pathMigrationMySQL: env.get('MIGRATION_MYSQL', "./migrations"),
   languageSource: LanguageSource.dart,
   dartLanguages: languageDart,
-  publicDir: pathTo(env['PUBLIC_DIR'] ?? './public'),
-  dbConfig: FinchDBConfig(
-    enable: false,
-  ),
-  port: (env['DOMAIN_PORT'] ?? '2020').toInt(def: 2020),
+  publicDir: pathTo(env.get('PUBLIC_DIR', './public')),
+  dbConfig: FinchDBConfig(enable: false),
+  port: env.getInt('DOMAIN_PORT', 2020),
   mysqlConfig: FinchMysqlConfig(
     enable: true,
-    host: env['MYSQL_HOST'] ?? 'localhost',
-    port: (env['MYSQL_PORT'] ?? '3306').toInt(def: 3306),
-    user: env['MYSQL_USER'] ?? 'example_user',
-    pass: env['MYSQL_PASSWORD'] ?? 'example_password',
-    databaseName: env['MYSQL_DATABASE'] ?? 'example_db',
+    host: env.get('MYSQL_HOST', 'localhost'),
+    port: env.getInt('MYSQL_PORT', 3306),
+    user: env.get('MYSQL_USER', 'example_user'),
+    pass: env.get('MYSQL_PASSWORD', 'example_password'),
+    databaseName: env.get('MYSQL_DATABASE', 'example_db'),
   ),
 
   /// Enable local debugger
-  enableLocalDebugger:
-      false, //(env['ENABLE_LOCAL_DEBUGGER'] ?? true).toString().toBool,
+  enableLocalDebugger: false,
 );
 
 class MainConfigs {
