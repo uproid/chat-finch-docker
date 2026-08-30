@@ -6,9 +6,12 @@ services:
     restart: always
     ports:
       - "2020:2020"
-      - "2121:2121"
+      - "8181:8181"
+      - "8282:8282"
     build:
       context: .
+    environment:
+      - LOCAL_DEBUG=true
     volumes:
       - ./lib/:/www/lib/
       - ./public/:/www/public/

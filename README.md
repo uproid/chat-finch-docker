@@ -39,7 +39,7 @@ docker/nginx.conf           # Nginx reverse proxy config
 
 | Service       | Description                              | Port        |
 |---------------|------------------------------------------|-------------|
-| `finch-chat`  | Dart/Finch app server                    | 2020, 2121  |
+| `finch-chat`  | Dart/Finch app server                    | 2020, 8181  |
 | `mysql`       | MySQL 8 database                         | 3306        |
 | `nginx`       | Reverse proxy / static file serving      | 2222        |
 | `nodejs`      | TailwindCSS watcher (dev)                | —           |

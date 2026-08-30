@@ -19,6 +19,6 @@ RUN echo "MYSQL_HOST=mysql" > .env && \
 
 RUN finch -u
 
-EXPOSE 2020 2121
+EXPOSE 2020 8181 8282
 
 CMD ["finch", "serve", "-p", "/www/lib/watcher.dart", "--args=\"migrate --init\""]

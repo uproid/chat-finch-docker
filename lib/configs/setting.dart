@@ -35,7 +35,7 @@ FinchConfigs configs = FinchConfigs(
   ),
 
   /// Enable local debugger
-  enableLocalDebugger: false,
+  enableLocalDebugger: env.getBool('LOCAL_DEBUG', false),
 );
 
 class MainConfigs {
